@@ -34,7 +34,7 @@ def getContent():
 
 @app.route('/getFileName', methods=['GET', 'POST'])
 def getFileName():
-    f = codecs.open(os.path.join(upload_path, 'filename.txt'), 'r', encoding='utf-8')
+    f = codecs.open(os.path.join(upload_path, temp_file_name), 'r', encoding='utf-8')
     file_name = f.read()
     f.close()
     return file_name
