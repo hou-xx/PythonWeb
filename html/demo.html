@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>内容</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .textarea_display {
+            width: 40%;
+            resize: none;
+            margin: 20px 40px;
+            min-height: 200px;
+        }
+        .textarea_input {
+            width: 40%;
+            margin:20px 40px;
+            min-height: 200px;
+        }
+        .update{
+            width: 40%;
+            margin:20px 40px;
+            padding: 5px;
+        ;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <textarea class="textarea_display" id="textarea_display" readonly></textarea>
+    <textarea class="textarea_input" id="textarea_input"></textarea>
+    <button class="update" id="update" onclick="update()">update</button>
+</div>
+<script type="text/javascript">
+    // document.getElementById('test')
+    function getContent() {
+        var request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
+        request.onreadystatechange = function () { // 状态发生变化时，函数被回调
+            if (request.readyState === 4) { // 成功完成
+                // 判断响应结果:
+                if (request.status === 200) {
+                    // 成功，通过responseText拿到响应的文本:
+                    document.getElementById('textarea_display').value = request.responseText;
+                } else {
+                    document.getElementById('textarea_display').value = "error:" + request.status;
+                }
+            }
+        }
+        // 发送请求:
+        request.open('GET', '/getContent');
+        request.send();
+    }
+
+    function update() {
+        var content = document.getElementById('textarea_input').value;
+        var request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
+        var data = new FormData();
+        data.append("content",content);
+        request.onreadystatechange = function () { // 状态发生变化时，函数被回调
+            if (request.readyState === 4) { // 成功完成
+                // 判断响应结果:
+                if (request.status === 200) {
+                    // 成功，通过responseText拿到响应的文本:
+                    document.getElementById('textarea_display').value = content;
+                } else {
+                    document.getElementById('textarea_display').value = "error:" + request.status;
+                }
+            }
+        }
+        // 发送请求:
+        request.open('POST', '/update');
+        request.send(data);
+    }
+    getContent();
+</script>
+
+</body>
+</html>
