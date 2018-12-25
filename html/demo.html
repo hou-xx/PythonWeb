@@ -18,27 +18,38 @@
             margin: 20px 40px;
             min-height: 200px;
         }
+
         .textarea_input {
             width: 40%;
-            margin:20px 40px;
+            margin: 20px 40px;
             min-height: 200px;
         }
-        .update{
+
+        .update {
             width: 40%;
-            margin:20px 40px;
-            padding: 5px;
-        ;
+            margin: 20px 40px;
+            padding: 5px;;
         }
     </style>
 </head>
+
 <body>
 <div class="container">
     <textarea class="textarea_display" id="textarea_display" readonly></textarea>
     <textarea class="textarea_input" id="textarea_input"></textarea>
     <button class="update" id="update" onclick="update()">update</button>
+    <div class="update_file_container">
+        <input type="file" class="select_file" id="select_file"></input>
+        <div class="prompt" id="prompt"></div>
+
+    </div>
+    <div class="file_name" id="file_name"></div>
+    <div class="update_file_container">
+        <button class="update_file" id="update_file" onclick="uploadFile()">uploadFile</button>
+        <a href="/downloadFile" class="update_file" id="down_file" download>downloadFile</a>
+    </div>
 </div>
 <script type="text/javascript">
-    // document.getElementById('test')
     function getContent() {
         var request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
         request.onreadystatechange = function () { // 状态发生变化时，函数被回调
@@ -57,11 +68,30 @@
         request.send();
     }
 
+    function getFileName() {
+        var request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
+        request.onreadystatechange = function () { // 状态发生变化时，函数被回调
+            if (request.readyState === 4) { // 成功完成
+                // 判断响应结果:
+                if (request.status === 200) {
+                    // 成功，通过responseText拿到响应的文本:
+                    console.log(request.responseText);
+                    document.getElementById('file_name').value = request.responseText;
+                } else {
+                    document.getElementById('file_name').value = "error:" + request.status;
+                }
+            }
+        }
+        // 发送请求:
+        request.open('GET', '/getFileName');
+        request.send();
+    }
+
     function update() {
         var content = document.getElementById('textarea_input').value;
         var request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
         var data = new FormData();
-        data.append("content",content);
+        data.append("content", content);
         request.onreadystatechange = function () { // 状态发生变化时，函数被回调
             if (request.readyState === 4) { // 成功完成
                 // 判断响应结果:
@@ -77,8 +107,39 @@
         request.open('POST', '/update');
         request.send(data);
     }
-    getContent();
-</script>
 
+    function uploadFile() {
+        var fileObj = document.getElementById('select_file').files[0];
+        if (fileObj) {
+            var form = new FormData();
+            form.enctype = "multipart/form-data";
+            form.append('file', fileObj);
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () { // 状态发生变化时，函数被回调
+                if (xhr.readyState === 4) { // 成功完成
+                    // 判断响应结果:
+                    if (xhr.status === 200) {
+                        getFileName();
+                        alert("Upload Success !");
+                    } else {
+                        alert("Upload Fail !");
+                    }
+                }
+            }
+            xhr.open("post", "/uploadFile", true);
+            xhr.send(form);
+        } else {
+            alert('请先选择文件！');
+        }
+    }
+
+    getContent();
+    getFileName();
+    var fileInput = document.getElementById('select_file');
+    fileInput.addEventListener('change', function () {
+        document.getElementById('prompt').value = fileInput.value ? fileInput.value : "没有选择文件";
+    });
+</script>
 </body>
+
 </html>
