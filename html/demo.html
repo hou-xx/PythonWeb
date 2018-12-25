@@ -108,9 +108,9 @@
                 if (request.status === 200) {
                     // 成功，通过responseText拿到响应的文本:
                     console.log(request.responseText);
-                    document.getElementById('file_name').value = request.responseText;
+                    document.getElementById('file_name').innerHTML = request.responseText;
                 } else {
-                    document.getElementById('file_name').value = "error:" + request.status;
+                    document.getElementById('file_name').innerHTML = "error:" + request.status;
                 }
             }
         }
