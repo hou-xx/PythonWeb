@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 base_path = os.path.dirname(os.path.realpath(__file__))  # 获取脚本路径
 
+temp_file_name = 'file_name'
+
 upload_path = os.path.join(base_path, 'upload')  # 上传文件目录
 if not os.path.exists(upload_path):
     os.makedirs(upload_path)
@@ -53,23 +55,22 @@ def uploadFile():
     # 需要从request对象读取表单内容：
     filedata = request.files.get('file')
     if filedata:
-        filePath = os.path.join(upload_path, filedata.filename)
-        f = codecs.open(os.path.join(upload_path, 'filename.txt'), 'w', encoding='utf-8')
+        file_path = os.path.join(upload_path, filedata.filename)
+        f = codecs.open(os.path.join(upload_path, temp_file_name), 'w', encoding='utf-8')
         f.write(filedata.filename)
         f.close()
         try:
-            filedata.save(filePath)  #  上传文件写入
+            filedata.save(file_path)  #  上传文件写入
         except IOError:
             return '上传文件失败'
-        return '上传文件成功, 文件名: {}'.format(filePath)
+        return '上传文件成功, 文件名: {}'.format(file_path)
     else:
         return '上传文件失败'
 
 
 @app.route('/downloadFile', methods=['GET'])
 def downloadFile():
-    f = codecs.open(os.path.join(upload_path, 'filename.txt'), 'r', encoding='utf-8')
+    f = codecs.open(os.path.join(upload_path, temp_file_name), 'r', encoding='utf-8')
     file_name = f.read()
-    print(file_name)
     f.close()
     return send_from_directory(upload_path, file_name, as_attachment=True)  # 返回要下载的文件内容给客户端
